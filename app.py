@@ -9,6 +9,10 @@ load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+
 st.set_page_config(
     page_title="AI Multiverse",
     page_icon="🌌",
@@ -59,8 +63,6 @@ color:gray;
 </style>
 """, unsafe_allow_html=True)
 
-if "history" not in st.session_state:
-    st.session_state.history=[]
 
 personalities={
 "🦾 Iron Man":"You are Tony Stark (Iron Man). Speak confidently with humor and intelligence.",
@@ -139,7 +141,45 @@ surprise=[
 ]
 
 if st.sidebar.button("🎲 Surprise Me"):
-    st.session_state["message"]=random.choice(surprise)
+    surprise_msg = random.choice(surprise)
+    st.session_state.messages.append({"role": "user", "content": surprise_msg})
+    
+    # Prepare prompt with history
+    history_context = ""
+    for msg in st.session_state.messages:
+        role_name = "User" if msg["role"] == "user" else personality
+        history_context += f"{role_name}: {msg['content']}\n"
+        
+    prompt = f"""
+{personalities[personality]}
+
+{styles[reply_style]}
+
+{lengths[reply_length]}
+
+Stay completely in character.
+
+Here is the conversation history so far:
+{history_context}
+"""
+    start = time.time()
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.1-flash-lite",
+            contents=prompt
+        )
+        st.session_state.messages.append({"role": "assistant", "content": response.text})
+        end = time.time()
+        st.session_state["response_time"] = round(end - start, 2)
+    except Exception as e:
+        st.error(e)
+    st.rerun()
+
+if st.sidebar.button("🗑 CLEAR CHAT"):
+    st.session_state.messages = []
+    if "response_time" in st.session_state:
+        del st.session_state["response_time"]
+    st.rerun()
 
 st.title("🌌 THE MULTIVERSE OF CHATBOTS")
 
@@ -147,35 +187,25 @@ st.write("Talk to famous personalities from across the multiverse!")
 
 st.info(f"Currently talking to **{personality}**")
 
-message=st.text_area(
-"💬 Type your message",
-value=st.session_state.get("message",""),
-height=120
-)
+# Task 2: Render the Chat History
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-st.caption(f"Characters: {len(message)}")
+# Task 3: Upgrade the Input UI & Task 4: Save New Messages to Memory
+if user_message := st.chat_input("Say something...", max_chars=500):
+    # Display the user message in the chat container
+    with st.chat_message("user"):
+        st.markdown(user_message)
+    
+    # Save user message to memory
+    st.session_state.messages.append({"role": "user", "content": user_message})
 
-col1,col2=st.columns(2)
-
-with col1:
-    send=st.button("🚀 SEND")
-
-with col2:
-    clear = st.button("🗑 CLEAR CHAT")
-
-    if clear:
-        st.session_state.history = []
-        st.rerun()
-
-if send:
-
-    if message.strip() == "":
-        st.warning("⚠ Please type a message first.")
-        st.stop()
-
-    if len(message) > 500:
-        st.error("Message should be less than 500 characters.")
-        st.stop()
+    # Prepare prompt with history
+    history_context = ""
+    for msg in st.session_state.messages:
+        role_name = "User" if msg["role"] == "user" else personality
+        history_context += f"{role_name}: {msg['content']}\n"
 
     prompt = f"""
 {personalities[personality]}
@@ -186,76 +216,41 @@ if send:
 
 Stay completely in character.
 
-User:
-{message}
+Here is the conversation history so far:
+{history_context}
 """
-
+    
     start = time.time()
-
     with st.spinner("🧠 AI is thinking..."):
-
         try:
-
             response = client.models.generate_content(
                 model="gemini-3.1-flash-lite",
                 contents=prompt
             )
-
             reply = response.text
-
-            current_time = datetime.now().strftime("%I:%M %p")
-
-            st.session_state.history.append(
-                {
-                    "user": message,
-                    "ai": reply,
-                    "time": current_time,
-                    "personality": personality
-                }
-            )
-
+            
+            # Display assistant response in chat message container
+            with st.chat_message("assistant"):
+                st.markdown(reply)
+            
+            # Save assistant response to memory
+            st.session_state.messages.append({"role": "assistant", "content": reply})
+            
+            end = time.time()
+            st.session_state["response_time"] = round(end - start, 2)
+            
         except Exception as e:
             st.error(e)
+            
+    st.rerun()
 
-    end = time.time()
-
-st.divider()
-
-for chat in st.session_state.history:
-
-    st.markdown(f"""
-<div class="chat-user">
-
-👤 <b>You</b><br><br>
-
-{chat["user"]}
-
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown(f"""
-<div class="chat-ai">
-
-{chat["personality"]} <br>
-🕒 {chat["time"]}<br><br>
-
-{chat["ai"]}
-
-</div>
-""", unsafe_allow_html=True)
-
-if len(st.session_state.history) > 0:
-
+if len(st.session_state.messages) > 0:
     full_chat = ""
-
-    for chat in st.session_state.history:
-
+    for msg in st.session_state.messages:
+        role_label = "You" if msg["role"] == "user" else "AI"
         full_chat += f"""
-You:
-{chat['user']}
-
-AI:
-{chat['ai']}
+{role_label}:
+{msg['content']}
 
 ------------------------------------
 
@@ -271,22 +266,17 @@ st.divider()
 
 st.subheader("📊 Chat Statistics")
 
-total_characters = sum(len(chat["user"]) for chat in st.session_state.history)
-
-total_messages = len(st.session_state.history)
-
-total_words = sum(len(chat["user"].split()) for chat in st.session_state.history)
+total_messages = len([msg for msg in st.session_state.messages if msg["role"] == "user"])
+total_characters = sum(len(msg["content"]) for msg in st.session_state.messages if msg["role"] == "user")
+total_words = sum(len(msg["content"].split()) for msg in st.session_state.messages if msg["role"] == "user")
 
 c1, c2, c3 = st.columns(3)
-
 c1.metric("Messages", total_messages)
-
 c2.metric("Characters", total_characters)
-
 c3.metric("Words", total_words)
 
-if send:
-    st.success(f"⏱ Response generated in {round(end-start,2)} seconds")
+if "response_time" in st.session_state:
+    st.success(f"⏱ Response generated in {st.session_state.response_time} seconds")
 
 st.markdown("""
 <div class="footer">
