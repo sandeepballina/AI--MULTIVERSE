@@ -1,48 +1,74 @@
-# 🌌 The Multiverse of Chatbots: Memory Vault Edition
+# 🎨 AI Image Studio
 
-An interactive, stateful Streamlit chatbot application powered by Google Gemini, completed as part of the **MirAI School of Technology Virtual Summer Internship 2026 ("AI Builder" Track)**.
+An AI-powered image generation app built with Streamlit and the Pollinations AI API.
+Built as part of the **MirAI School of Technology — Virtual Summer Internship 2026, AI Builder Track**.
 
-This version features the implementation of the **Memory Vault (Stateful Chatbot)** assignment, transforming a previously stateless chatbot into a fully stateful conversational experience.
+## 🚀 Live Demo
 
-## 🚀 Key Features
+Run locally with:
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+Then open `http://localhost:8501` in your browser.
 
-- **Stateful Memory Vault**: Utilizes Streamlit's `st.session_state` to store and maintain conversation history across page interactions and configuration changes.
-- **Modern Chat Interface**: Employs Streamlit's native `st.chat_input` and `st.chat_message` widgets for a seamless, messaging-app feel.
-- **Multiverse Personalities**: Toggle between 15+ famous personalities (e.g., Iron Man, Batman, Sherlock Holmes, Cristiano Ronaldo Fan, Ethical Hacker, Albert Einstein, and more) on-the-fly without losing chat history.
-- **Customizable Responses**: Adjust response style (Friendly, Funny, Professional, etc.) and lengths (Short, Medium, Long).
-- **Interactive Side Utilities**:
-  - 🎲 **Surprise Me**: Generates a random topic prompt in-character.
-  - 🗑 **Clear Chat**: Instantly wipes the conversation history.
-  - 📥 **Download Conversation**: Exports the full transcript.
-  - 📊 **Chat Statistics**: Live tracking of messages, total characters, and word counts.
+## ✨ Features
 
-## 🛠 Installation & Setup
+This version upgrades the original prototype with the following fixes and features:
 
-1. **Clone the Repository**:
+### 1. Fixed Broken Sliders (URL Parameters)
+The width and height sliders in the sidebar now actually control the output image size. Previously the values were captured in the UI but never sent to the API — the generation URL now includes `?width=...&height=...` so the sliders work as expected.
+
+### 2. Fixed Download File Extension
+Downloaded images now save with a proper `.png` extension so the OS recognizes and opens them correctly. The filename is also dynamic, based on the selected art style (e.g. `cyberpunk_image.png`).
+
+### 3. ✨ Magic Enhance Toggle
+A sidebar checkbox that, when enabled, automatically appends quality-boosting keywords (`masterpiece, 8k resolution, highly detailed, trending on artstation, unreal engine 5 render`) to the prompt — helpful for users who write short or simple descriptions.
+
+### 4. 🎲 Surprise Me!
+A one-click button that picks a random, creative prompt from a curated list (using Python's `random.choice()`) and instantly generates an image — great for beating writer's block.
+
+## 🛠️ Tech Stack
+
+- **[Streamlit](https://streamlit.io/)** — UI framework
+- **[Pollinations AI](https://pollinations.ai/)** — free image generation API
+- **Python** `requests` — API calls
+- **python-dotenv** — environment variable management
+
+## 📂 Project Structure
+
+```
+.
+├── app.py              # Main Streamlit application
+├── requirements.txt    # Python dependencies
+├── .env                # Environment variables (not committed)
+├── .gitignore
+└── README.md
+```
+
+## ⚙️ Setup
+
+1. Clone the repo:
    ```bash
-   git clone <repository-url>
-   cd AI-MULTIVERSE
+   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   cd YOUR_REPO_NAME
    ```
-
-2. **Install Dependencies**:
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-
-3. **Configure Environment Variables**:
-   Create a `.env` file in the root directory and add your Gemini API Key:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-
-4. **Run the Application**:
+3. Run the app:
    ```bash
    streamlit run app.py
    ```
 
-## 📝 Assignment Requirements Implemented
+## 📋 Pre-Submission Checklist
 
-- **Task 1: Initialize the Memory Vault** - Checked and initialized `st.session_state.messages` list on application startup.
-- **Task 2: Render the Chat History** - Replaced custom HTML/CSS with standard loop utilizing `st.chat_message` container.
-- **Task 3: Upgrade the Input UI** - Replaced `st.text_area` and `st.button` with `st.chat_input` using the Python walrus operator (`:=`).
-- **Task 4: Save New Messages to Memory** - Programmatically appended user inputs and Gemini API assistant outputs to `st.session_state.messages`.
+- [x] Width and height sliders control the generated image's dimensions
+- [x] Downloaded images open correctly as `.png` files
+- [x] "Surprise Me" button generates a random image on click
+- [x] "Magic Enhance" toggle appends quality-boost keywords to the prompt
+
+## 🎓 Credit
+
+Built during the **MirAI School of Technology** Virtual Summer Internship 2026 — AI Builder Track.
