@@ -164,7 +164,7 @@ st.sidebar.caption("Powered by Pollinations AI · Built with Streamlit")
 # ─────────────────────────────────────────────────────────────────
 #  Hero Header
 # ─────────────────────────────────────────────────────────────────
-st.markdown('<div class="badge-container"><span class="badge">🎓 MirAI School of Technology</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="badge-container"><span class="badge">AI STUDIO</span></div>', unsafe_allow_html=True)
 st.markdown('<h1 class="hero-title">🎨 AI Image Studio</h1>', unsafe_allow_html=True)
 st.markdown('<p class="hero-subtitle">Transform your imagination into stunning AI-generated artwork</p>', unsafe_allow_html=True)
 
@@ -416,7 +416,7 @@ with tip_col3:
 st.markdown("""
 <div class="footer">
 <hr style="border-color:rgba(255,255,255,0.1)">
-🎓 <b>MirAI School of Technology</b> · Virtual Summer Internship 2026 · AI Builder Track<br>
+🎓 <b>AI STUDIO</b> · Virtual Summer Internship 2026 · AI Builder Track<br>
 🎨 <b>AI Image Studio v2.0</b> · Powered by Pollinations AI + Streamlit<br>
 Built with ❤️ as part of the Weekend Assignment
 </div>
