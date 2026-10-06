@@ -1,7 +1,7 @@
 # 🎨 AI Image Studio
 
 An AI-powered image generation app built with Streamlit and the Pollinations AI API.
-Built as part of the **MirAI School of Technology — Virtual Summer Internship 2026, AI Builder Track**.
+Built as part of the **Virtual Summer Internship 2026, AI Builder Track**.
 
 ## 🚀 Live Demo
 
@@ -71,4 +71,4 @@ A one-click button that picks a random, creative prompt from a curated list (usi
 
 ## 🎓 Credit
 
-Built during the **MirAI School of Technology** Virtual Summer Internship 2026 — AI Builder Track.
+Built during the Virtual Summer Internship 2026 — AI Builder Track.
